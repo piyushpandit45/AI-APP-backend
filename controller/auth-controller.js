@@ -15,6 +15,8 @@ const generateToken = (user) => {
 
 export const registerUser = async (req, res) => {
   try {
+    console.log('🔍 Signup request received:', req.body.email);
+    
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
@@ -76,6 +78,8 @@ export const registerUser = async (req, res) => {
 // @access  Public
 export const loginUser = async (req, res) => {
   try {
+    console.log('🔍 Login request received:', req.body.email);
+    
     const { email, password } = req.body;
     const loginId = String(email || '').trim();
 
@@ -87,6 +91,7 @@ export const loginUser = async (req, res) => {
     const user = await User.findOne(query);
 
     if (user && (await bcrypt.compare(password, user.password))) {
+      console.log('✅ Login successful for:', user.email);
       res.json({
         success: true,
         data: {
@@ -98,6 +103,7 @@ export const loginUser = async (req, res) => {
         message: "Login successful"
       });
     } else {
+      console.log('❌ Login failed for:', loginId);
       res.status(401).json({ success: false, message: "Invalid email/username or password" });
     }
   } catch (error) {

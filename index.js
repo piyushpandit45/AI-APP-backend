@@ -23,33 +23,8 @@ connectDB();
 // 3) middlewares
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
-
-      // Allow localhost origins for development (both localhost and 127.0.0.1)
-      if (origin.match(/^http:\/\/localhost:\d+$/) || origin.match(/^http:\/\/127\.0\.0\.1:\d+$/)) {
-        return callback(null, true);
-      }
-
-      // Allow specific production domains
-      const allowedOrigins = [
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "http://localhost:5175",
-        "http://localhost:3000",
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:5174",
-        "http://127.0.0.1:5175",
-        "http://127.0.0.1:3000"
-      ];
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      return callback(new Error('Not allowed by CORS'));
-    },
+    origin: "*", // Allow all origins for production
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
   })
 );
@@ -67,6 +42,15 @@ app.use("/api/contact", contactRoutes);
 // 5) test route
 app.get("/", (req, res) => {
   res.send("🚀 API is running successfully");
+});
+
+// 5.1) health check for Render
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    message: "Backend is healthy and running",
+    timestamp: new Date().toISOString()
+  });
 });
 
 // 6) global error handler (professional)
@@ -106,6 +90,7 @@ app.use((err, req, res, next) => {
 // 7) start server
 const PORT = process.env.PORT || 9001;
 
-app.listen(PORT, () => {
-  console.log(`✅ Server Started on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ Server Started on port ${PORT}`);
+  console.log(`✅ Server accessible at: http://0.0.0.0:${PORT}`);
 });
